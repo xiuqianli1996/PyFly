@@ -5,6 +5,7 @@ Flask + Layui Fly Template实现的一个社区项目，使用flask-admin实现�
 
 #### 软件架构
 1.前端模板：[Layui Fly Template](http://www.layui.com/template/fly/)
+
 2.Flask + flask-pymongo + flask-admin + flask-login + flask-mail
 
 
