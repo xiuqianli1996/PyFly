@@ -7,7 +7,7 @@ class Dev:
     MAIL_USE_TLS = True
     MAIL_USE_SSL = False
     MAIL_USERNAME = 'xiuqianli_2015@163.com'
-    MAIL_PASSWORD = 'asdf1234'
+    MAIL_PASSWORD = ''
     MAIL_DEBUG = True
     MAIL_SUBJECT_PREFIX = '[PyFly]-'
 
