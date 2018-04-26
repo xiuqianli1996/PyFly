@@ -26,9 +26,11 @@ python manager.py
 
 #### 使用说明
 
-1. 首次打开会自动往MongoDB新增一些默认数据（管理员账号和默认配置项）
+1. 首次打开会自动往MongoDB新增一些默认数据（管理员账号和默认配置项），后台管理（flask-admin简单实现）: http://127.0.0.1:5000/admin
+
 2. 可自己修改扩展模板作为信息分类网站或者简单的cms、博客
-3.19应届小菜鸟初学Python的作品，希望各位大佬指正，另外如果能有个实习岗位就更好了，邮箱：981764793@qq.com
+
+3.19应届小菜鸟初学Python的作品，都做得比较粗糙，希望各位大佬指正，另外如果能有个实习岗位就更好了，邮箱：981764793@qq.com
 
 ####模板开发
 
@@ -40,3 +42,10 @@ python manager.py
     2）get_list(collection_name, sort_by=None, filter1=None, size=None) 列表查询
     3）find_one(collection_name, filter1=None) 获取单条
     4）date_cal(d1, num, is_add=True) 计算日期
+
+
+####Todo
+
+1.社交账号登录
+
+2.暂时没想到。。。
