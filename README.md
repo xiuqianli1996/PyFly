@@ -32,6 +32,8 @@ python manager.py
 
 3.19应届小菜鸟初学Python的作品，都做得比较粗糙，希望各位大佬指正，另外如果能有个实习岗位就更好了，邮箱：981764793@qq.com
 
+4.图片上传可选保存到后端或图床，默认保存到服务器，如果要开启图床上传在/static/js/mods/index.js搜索开启图床注释和解开相应注释后即可，然后在user.js进行相应操作，图床使用了[SM.MS图床](http://sm.ms)
+
 ####模板开发
 
 1.全局过滤器mongo_date_str（格式化mongodb的日期字段）
@@ -49,3 +51,17 @@ python manager.py
 1.社交账号登录
 
 2.暂时没想到。。。
+
+#### 截图预览
+
+![首页1](https://gitee.com/uploads/images/2018/0426/180217_6c36771c_750007.png "QQ截图20180426175656.png")
+
+![首页2](https://gitee.com/uploads/images/2018/0426/180231_079d2ac1_750007.png "QQ截图20180426175715.png")
+
+![发帖](https://gitee.com/uploads/images/2018/0426/180246_dd80896b_750007.png "QQ截图20180426175740.png")
+
+![回帖](https://gitee.com/uploads/images/2018/0426/180259_11602e95_750007.png "QQ截图20180426175828.png")
+
+![个人设置](https://gitee.com/uploads/images/2018/0426/180310_de7a3005_750007.png "QQ截图20180426175906.png")
+
+![用户主页](https://gitee.com/uploads/images/2018/0426/180325_60301b7a_750007.png "QQ截图20180426175922.png")
