@@ -1,0 +1,32 @@
+{% extends 'user/user_base.html' %}
+{% import '_pagination.html' as pagination %}
+{% block content %}
+  <div class="layui-tab layui-tab-brief" lay-filter="user" id="LAY_msg" style="margin-top: 15px;">
+    {% if page.total > 0 %}
+    <button class="layui-btn layui-btn-danger" id="LAY_delallmsg">清空全部消息</button>
+    {% endif %}
+
+    <div id="LAY_minemsg" style="margin-top: 10px;">
+      <!--<div class="fly-none">您暂时没有最新消息</div>-->
+      <ul class="mine-msg">
+        {% for item in page.result %}
+          <li data-id="{{ item._id }}">
+            <blockquote class="layui-elem-quote">
+              {{ item.content|safe }}
+            </blockquote>
+            <p><span>{{ item.create_at|mongo_date_str }}</span><a href="javascript:;"
+                                   class="layui-btn layui-btn-small layui-btn-danger fly-delete">删除</a>
+            </p>
+          </li>
+        {% else %}
+          <div style="min-height: 60px; text-align: center; padding-top:50px; color: #999;">您暂时没有最新消息</div>
+        {% endfor %}
+      </ul>
+      {% if page.total_page > 1 %}
+        {% set url_prefix="/user/message" %}
+{#        {% include '_pagination.html' %}#}
+        {{ pagination.paginate(page, url_prefix, url_suffix) }}
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}

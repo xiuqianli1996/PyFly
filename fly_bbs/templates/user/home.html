@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% block body %}
+
+  <div class="fly-home fly-panel">
+    <img src="{{ user.avatar }}" alt="{{ user.username }}">
+
+  {% if user.renzheng %}
+      <i class="iconfont icon-renzheng" title="社区认证"></i>
+    {% endif %}
+    <h1>
+      {{ user.username }}
+      {% if user.sex == '0' %}
+        <i class="iconfont icon-nan"></i>
+        {% else %}
+        <i class="iconfont icon-nv"></i>
+      {% endif %}
+      {% if user.get('vip', 0) > 0 %}
+        <i class="layui-badge fly-badge-vip">VIP{{ user.vip }}</i>
+      {% endif %}
+      {% if user.is_admin %}
+        <span style="color:#c00">(管理员)</span>
+      {% endif %}
+      {% if user.is_disabled %}
+        <span style="color:#999">（该号已被封）</span>
+      {% endif %}
+    </h1>
+
+    {% if user.renzheng %}
+      <p style="padding: 10px 0; color: #5FB878;">认证信息：{{ user.renzheng }}</p>
+    {% endif %}
+
+
+    <p class="fly-home-info">
+      <i class="iconfont icon-jifen" title="金币"></i><span style="color: #FF7200;">{{ user.get('coin', 0) }} 金币</span>
+      <i class="iconfont icon-shijian"></i><span>{{ user.get('create_at')|mongo_date_str or '时间保密 ' }} 加入</span>
+      <i class="iconfont icon-chengshi"></i><span>来自{{ user.get('city') or '保密的火星' }}</span>
+    </p>
+
+    <p class="fly-home-sign">({{ user.get('desc') or '这家伙懒得留下签名' }})</p>
+
+{#    <div class="fly-sns" data-user="">#}
+{#      <a href="javascript:;" class="layui-btn layui-btn-primary fly-imActive" data-type="addFriend">加为好友</a>#}
+{#      <a href="javascript:;" class="layui-btn layui-btn-normal fly-imActive" data-type="chat">发起会话</a>#}
+{#    </div>#}
+
+  </div>
+
+  <div class="layui-container">
+    <div class="layui-row layui-col-space15">
+      <div class="layui-col-md6 fly-home-jie">
+        <div class="fly-panel">
+          <h3 class="fly-panel-title">{{ user.username }} 最近的帖子</h3>
+          <ul class="jie-row">
+            {% for item in get_list('posts', size=10, sort_by=('_id', -1), filter1={'user_id': user._id}) %}
+              <li>
+                {% if item.is_cream %}
+                  <span class="fly-jing">精</span>
+                {% endif %}
+                <a href="{{ url_for('index.post_detail', post_id=item._id) }}" class="jie-title"> {{ item.title }}</a>
+                <i>{{ item.create_at|mongo_date_str }}</i>
+                <em class="layui-hide-xs">{{ item.get('view_count', 0) }}阅/{{ item.get('comment_count', 0) }}答</em>
+              </li>
+              {% else %}
+              <div class="fly-none" style="min-height: 50px; padding:30px 0; height:auto;"><i style="font-size:14px;">没有发表任何帖子</i></div>
+            {% endfor %}
+
+          </ul>
+        </div>
+      </div>
+
+      <div class="layui-col-md6 fly-home-da">
+        <div class="fly-panel">
+          <h3 class="fly-panel-title">{{ user.username }} 最近的回帖</h3>
+          <ul class="home-jieda">
+            {% for item in get_list('comments', size=10, sort_by=('_id', -1), filter1={'user_id': user._id}) %}
+              {% set item_post=mongo_find_one('posts', {'_id': item.post_id}) %}
+              <li>
+                <p>
+                  <span>{{ item.create_at|mongo_date_str }}</span>
+                  在<a href="{{ url_for('index.jump_comment', comment_id=item._id) }}" target="_blank">{{ item_post.title or '(已删除)' }}</a>中回答：
+                </p>
+                <div class="home-dacontent">
+                  {{ item.content }}
+                </div>
+              </li>
+              {% else %}
+              <div class="fly-none" style="min-height: 50px; padding:30px 0; height:auto;"><i style="font-size:14px;">没有发表任何回帖</i></div>
+            {% endfor %}
+
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block fly_use %}
+  .use(['fly', 'face'], function(){
+  var $ = layui.$
+  ,fly = layui.fly;
+  $('.home-dacontent').each(function(){
+  var othis = $(this), html = othis.html();
+  othis.html(fly.content(html));
+  });
+  });
+{% endblock %}

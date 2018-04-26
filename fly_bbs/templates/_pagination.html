@@ -1,0 +1,40 @@
+{% macro paginate(page, url_prefix='/', url_suffix='') %}
+  {% set url_prefix=url_prefix if url_prefix.endswith('/') else url_prefix + '/' %}
+<div style="text-align: center">
+  <div class="laypage-main">
+    {% if page.pn > 1 and page.pn <= page.total_page %}
+      <a href="{{ url_prefix }}page/{{ page.pn - 1 }}{{ ('/size/' + page.size|string) if page.size != 10 }}{{ url_suffix }}" class="laypage-prev">上一页</a>
+    {% endif %}
+    {% if page.pn > 4 %}
+      <span>…</span>
+    {% endif %}
+    {% set page_start = page.pn - 2 %}
+    {% set page_end = page.pn + 2 %}
+    {% if page_start < 1 %}
+      {% set page_start = 1 %}
+      {% set page_end = 5 %}
+    {% endif %}
+    {% if page_end > page.total_page %}
+      {% set page_end = page.total_page %}
+      {% if page_end - 5 > 1 %}
+        {% set page_start = page_end - 5 %}
+      {% endif %}
+    {% endif %}
+    {% for i in range(page_start, page_end + 1) %}
+      {% if i == page.pn or page.pn > page.total_page %}
+        <span class="laypage-curr">{{ i }}</span>
+      {% else %}
+        <a href="{{ url_prefix }}page/{{ i }}{{ ('/size/' + page.size|string) if page.size != 10 }}{{ url_suffix }}">{{ i }}</a>
+      {% endif %}
+    {% endfor %}
+    {% if page.total_page - page.pn > 3 %}
+      <span>…</span>
+    {% endif %}
+    {% if page.pn < page.total_page %}
+      <a href="{{ url_prefix }}page/{{ page.pn + 1 }}{{ ('/size/' + page.size|string) if page.size != 10 }}{{ url_suffix }}" class="laypage-next">下一页</a>
+    {% endif %}
+
+  </div>
+</div>
+{% endmacro %}
+

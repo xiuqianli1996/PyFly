@@ -1,0 +1,18 @@
+{% extends 'admin/master.html' %}
+{% block body %}
+{{ super() }}
+<div class="row-fluid">
+  {% if not current_user.is_authenticated or not current_user.user.is_admin %}
+    当前用户未登录或者不是管理员
+    <a class="btn btn-primary" href="/user/login?next=/admin"><i class="icon-arrow-left icon-white"></i> 点击登录</a>
+    {% else %}
+    <h3>欢迎您，{{ current_user.user.username }}</h3>
+    <h4>请谨慎使用数据删除功能</h4>
+    <p style="color: red">删除栏目会清空该栏目下的所有帖子且无法恢复</p>
+    <a class="btn btn-primary" href="/"><i class="icon-arrow-left icon-white"></i> 返回前台</a>
+
+    <p>系统配置说明：键值对格式存储，系统带一些默认配置项，可随意删减，新增配置可在模板文件里通过get_option(代码)获取配置参数值</p>
+  {% endif %}
+
+</div>
+{% endblock body %}

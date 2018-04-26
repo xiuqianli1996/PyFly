@@ -1,0 +1,2 @@
+{% set all=post.get('comment_count', 0) %}
+<a href="/jump?username={{ post.user.username }}" target="_blank"><cite>{{ post.user.username }}</cite></a>在<a target="_blank" href="/post/{{ post._id }}/page/{{ all / 10 if all % 10 == 0 else (all / 10) + 1 }}/#item-{{ comment_id }}"><cite>{{ post.title }}</cite></a>中回复了你

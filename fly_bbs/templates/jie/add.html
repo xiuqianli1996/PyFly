@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+{% block body %}
+
+  <div class="layui-container fly-marginTop">
+    <div class="fly-panel" pad20 style="padding-top: 5px;">
+      <!--<div class="fly-none">没有权限</div>-->
+      <div class="layui-form layui-form-pane">
+        <div class="layui-tab layui-tab-brief" lay-filter="user">
+          <ul class="layui-tab-title">
+            <li class="layui-this">{% if is_add %}发表新帖 {% else %} 编辑帖子 {% endif %}</li>
+          </ul>
+          <div class="layui-form layui-tab-content" id="LAY_ucm" style="padding: 20px 0;">
+            <div class="layui-tab-item layui-show">
+              <form action="" method="post">
+                {{ form.csrf_token }}
+                <div class="layui-row layui-col-space15 layui-form-item">
+                  <div class="layui-col-md3">
+                    <label class="layui-form-label">所在专栏</label>
+                    <div class="layui-input-block">
+                      <select lay-verify="required" name="catalog_id" {{ 'disabled' if post.is_closed }}>
+                        <option></option>
+                        {% for item in get_list('catalogs') %}
+                          <option value="{{ item._id }}" {{ 'selected' if post and post['catalog_id'] == item._id }}>{{ item.name }}</option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                  </div>
+                  <div class="layui-col-md9">
+                    <label for="L_title" class="layui-form-label" >标题</label>
+                    <div class="layui-input-block">
+                      <input type="text" id="L_title" name="title" required lay-verify="required" autocomplete="off"
+                             class="layui-input" value="{{ post['title'] }}" {{ 'disabled' if post.is_closed }}>
+                      <input type="hidden" name="id" value="{{post_id}}">
+                    </div>
+                  </div>
+                </div>
+{#                <div class="layui-row layui-col-space15 layui-form-item layui-hide" id="LAY_quiz">#}
+{#                  <div class="layui-col-md3">#}
+{#                    <label class="layui-form-label">所属产品</label>#}
+{#                    <div class="layui-input-block">#}
+{#                      <select name="project">#}
+{#                        <option></option>#}
+{#                        <option value="layui">layui</option>#}
+{#                        <option value="独立版layer">独立版layer</option>#}
+{#                        <option value="独立版layDate">独立版layDate</option>#}
+{#                        <option value="LayIM">LayIM</option>#}
+{#                        <option value="Fly社区模板">Fly社区模板</option>#}
+{#                      </select>#}
+{#                    </div>#}
+{#                  </div>#}
+{#                  <div class="layui-col-md3">#}
+{#                    <label class="layui-form-label" for="L_version">版本号</label>#}
+{#                    <div class="layui-input-block">#}
+{#                      <input type="text" id="L_version" value="" name="version" autocomplete="off" class="layui-input">#}
+{#                    </div>#}
+{#                  </div>#}
+{#                  <div class="layui-col-md6">#}
+{#                    <label class="layui-form-label" for="L_browser">浏览器</label>#}
+{#                    <div class="layui-input-block">#}
+{#                      <input type="text" id="L_browser" value="" name="browser" placeholder="浏览器名称及版本，如：IE 11"#}
+{#                             autocomplete="off" class="layui-input">#}
+{#                    </div>#}
+{#                  </div>#}
+{#                </div>#}
+                <div class="layui-form-item layui-form-text">
+                  <div class="layui-input-block">
+                    <textarea id="L_content" name="content" required lay-verify="required" placeholder="详细描述"
+                              class="layui-textarea fly-editor" style="height: 260px;" {{ 'disabled' if post.is_closed }}>{{ post['content'] }}</textarea>
+                  </div>
+                </div>
+                <div class="layui-form-item">
+                  <div class="layui-inline">
+                    <label class="layui-form-label">悬赏金币</label>
+                    <div class="layui-input-inline" style="width: 190px;">
+                      <select name="reward" {{ 'disabled' if not is_add }}>
+                        {% for i in range(0, 101, 20) %}
+                          <option value="{{ i }}" {{ 'selected' if post and post['reward'] == i }}>{{ i }}</option>
+                        {% endfor %}
+
+                      </select>
+                    </div>
+                    <div class="layui-form-mid layui-word-aux">发表后无法更改悬赏数目</div>
+                  </div>
+                </div>
+                <div class="layui-form-item">
+                  <label for="L_vercode" class="layui-form-label">人类验证</label>
+                  <div class="layui-input-inline">
+                    <input type="text" id="L_vercode" name="vercode" required lay-verify="required"
+                           placeholder="请回答后面的问题" autocomplete="off" class="layui-input" {{ 'disabled' if post.is_closed }}>
+                  </div>
+                  <div class="layui-form-mid">
+                    <span style="color: #c00;">{{ ver_code }}</span>
+                  </div>
+                </div>
+                <div class="layui-form-item">
+                  <button class="layui-btn" lay-filter="*" alert="true" lay-submit {{ 'disabled' if post.is_closed }}>立即发布</button> {{ '帖子已结不能修改' if post.is_closed  }}
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+
+{% block other_js %}
+  {% if post['is_closed'] %}
+    <script>
+        layui.use('layer', function () {
+            var layer = layui.layer;
+            layer.alert('帖子已结不能修改', {
+                end: function () {
+                    location.href = '/'
+                }
+            });
+        })
+    </script>
+  {% endif %}
+{% endblock %}

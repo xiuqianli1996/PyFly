@@ -1,0 +1,40 @@
+{% set item_user = mongo_find_one('users', {'_id': item.user_id}) or {} %}
+{% set item_catalog = mongo_find_one('catalogs', {'_id': item.catalog_id}) %}
+<li>
+  <a href="/user/{{ item_user._id }}" class="fly-avatar">
+    <img src="{{ item_user.avatar or '/static/images/avatar/1.jpg' }}" alt="{{ item_user.username }}">
+  </a>
+  <h2>
+    <a class="layui-badge">{{ item_catalog.name }}</a>
+    <a href="/post/{{ item._id }}">{{ item.title }}</a>
+  </h2>
+  <div class="fly-list-info">
+    <a href="/user/{{ item_user._id or 'none'}}" link>
+      <cite>{{ item_user.username or '无名' }}</cite>
+      {% if item_user.renzheng %}
+        <i class="iconfont icon-renzheng">{{ item_user.renzheng }}</i>
+      {% endif %}
+      {% if item_user.get('vip', 0) > 0 %}
+        <i class="layui-badge fly-badge-vip">VIP{{ item_user.vip }}</i>
+      {% endif %}
+    </a>
+    <span>{{ item.create_at|mongo_date_str }}</span>
+    <span class="fly-list-kiss layui-hide-xs" title="悬赏金币"><i class="iconfont icon-jifen"></i>{{ item.get('reward', 0) }}</span>
+    {% if item.is_closed %}
+      <span class="layui-badge fly-badge-accept layui-hide-xs">已结</span>
+    {% endif %}
+
+    <span class="fly-list-nums">
+                <i class="iconfont icon-pinglun1" title="回答"></i> {{ item.get('comment_count', 0) }}
+                <i class="iconfont" title="查看">&#xe60b;</i> {{ item.get('view_count', 0) }}
+            </span>
+  </div>
+  <div class="fly-list-badge">
+    {% if item.is_top %}
+      <span class="layui-badge layui-bg-black">置顶</span>
+    {% endif %}
+    {% if item.is_cream %}
+      <span class="layui-badge layui-bg-red">精帖</span>
+    {% endif %}
+  </div>
+</li>

@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block body %}
+  <div class="layui-container fly-marginTop fly-user-main">
+  <ul class="layui-nav layui-nav-tree layui-inline" lay-filter="user">
+    <li class="layui-nav-item">
+      <a href="{{ url_for('user.user_home', user_id=current_user.user._id) }}">
+        <i class="layui-icon">&#xe609;</i>
+        我的主页
+      </a>
+    </li>
+    <li class="layui-nav-item {{ 'layui-this' if user_page == 'posts' }}">
+      <a href="{{ url_for('user.user_posts') }}">
+        <i class="layui-icon">&#xe612;</i>
+        我的帖子
+      </a>
+    </li>
+    <li class="layui-nav-item {{ 'layui-this' if user_page == 'set' }}">
+      <a href="{{ url_for('user.user_set') }}">
+        <i class="layui-icon">&#xe620;</i>
+        基本设置
+      </a>
+    </li>
+    <li class="layui-nav-item {{ 'layui-this' if user_page == 'message' }}">
+      <a href="{{ url_for('user.user_message') }}">
+        <i class="layui-icon">&#xe611;</i>
+        我的消息
+      </a>
+    </li>
+  </ul>
+
+  <div class="site-tree-mobile layui-hide">
+    <i class="layui-icon">&#xe602;</i>
+  </div>
+  <div class="site-mobile-shade"></div>
+
+  <div class="site-tree-mobile layui-hide">
+    <i class="layui-icon">&#xe602;</i>
+  </div>
+  <div class="site-mobile-shade"></div>
+
+
+  <div class="fly-panel fly-panel-user" pad20>
+    {% block content %}
+    {% endblock %}
+  </div>
+  </div>
+{% endblock %}

@@ -1,0 +1,212 @@
+{% extends 'posts.html' %}
+{% import '_pagination.html' as pagination %}
+{% set post_catalog = mongo_find_one('catalogs', {'_id': post.catalog_id}) %}
+{% block content %}
+  <div class="layui-col-md8 content detail">
+    <div class="fly-panel detail-box">
+      <h1>{{ post.title }}</h1>
+      <div class="fly-detail-info">
+        <!-- <span class="layui-badge">审核中</span> -->
+        <span class="layui-badge layui-bg-green fly-detail-column">{{ post_catalog.name }}</span>
+
+        {% if post.is_closed %}
+          <span class="layui-badge" style="background-color: #5FB878;">已结</span>
+        {% else %}
+          <span class="layui-badge" style="background-color: #999;">未结</span>
+        {% endif %}
+
+        {% if post.is_top %}
+          <span class="layui-badge layui-bg-black">置顶</span>
+        {% endif %}
+        {% if post.is_cream %}
+          <span class="layui-badge layui-bg-red">精帖</span>
+        {% endif %}
+        <div class="fly-admin-box" data-id="{{ post._id }}">
+          {% if current_user.is_authenticated  and (post.user_id == current_user.user._id or current_user.user.is_admin) %}
+
+            <span class="layui-btn layui-btn-xs jie-admin" type="del">删除</span>
+            {% if not post.is_closed %}
+              <span class="layui-btn layui-btn-xs jie-admin" type="set" field="is_closed" rank="1">结帖</span>
+            {% endif %}
+
+            {% if current_user.user.is_admin %}
+
+              {% if post.is_top %}
+                <span class="layui-btn layui-btn-xs jie-admin" type="set" field="is_top" rank="0"
+                      style="background-color:#ccc;">取消置顶</span>
+              {% else %}
+                <span class="layui-btn layui-btn-xs jie-admin" type="set" field="is_top" rank="1">置顶</span>
+              {% endif %}
+              {% if post.is_cream %}
+                <span class="layui-btn layui-btn-xs jie-admin" type="set" field="is_cream" rank="0"
+                      style="background-color:#ccc;">取消加精</span>
+              {% else %}
+                <span class="layui-btn layui-btn-xs jie-admin" type="set" field="is_cream" rank="1">加精</span>
+              {% endif %}
+            {% endif %}
+
+
+          {% endif %}
+        </div>
+
+        <span class="fly-list-nums">
+            <a href="#comment"><i class="iconfont" title="回答">&#xe60c;</i> {{ post.get('comment_count', 0) }}</a>
+            <i class="iconfont" title="人气">&#xe60b;</i> {{ post.get('view_count', 0) }}
+        </span>
+      </div>
+      <div class="detail-about">
+        <a class="fly-avatar" href="/user/{{ post.user._id }}">
+          <img src="{{ post.user.avatar or '/static/images/avatar/1.jpg' }}" alt="{{ post.user.username }}">
+        </a>
+        <div class="fly-detail-user">
+          <a href="/user/{{ post.user._id }}" class="fly-link">
+            <cite>{{ post.user.username or '无名' }}</cite>
+            {% if post.user.renzheng %}
+              <i class="iconfont icon-renzheng">{{ post.user.renzheng }}</i>
+            {% endif %}
+            {% if post.user.get('vip', 0) > 0 %}
+              <i class="layui-badge fly-badge-vip">VIP{{ post.user.vip }}</i>
+            {% endif %}
+          </a>
+          <span>{{ post.create_at|mongo_date_str }}</span>
+        </div>
+        <div class="detail-hits" id="LAY_jieAdmin" data-id="{{ post._id }}">
+          <span style="padding-right: 10px; color: #FF7200">悬赏：{{ post.get('reward', 0) }}金币</span>
+          {% if current_user.is_authenticated and (post.user._id == current_user.user._id or current_user.user.is_admin) and not post.is_closed %}
+            <span class="layui-btn layui-btn-xs jie-admin" type="edit"><a href="/edit/{{ post._id }}">编辑此贴</a></span>
+          {% endif %}
+        </div>
+      </div>
+      <div class="detail-body photos">
+        {{ post.content }}
+      </div>
+    </div>
+
+    <div class="fly-panel detail-box" id="flyReply">
+      <fieldset class="layui-elem-field layui-field-title" style="text-align: center;">
+        <legend>回帖</legend>
+      </fieldset>
+
+      <ul class="jieda" id="jieda">
+        {% for item in comment_page.result %}
+          {% set item_user = mongo_find_one('users', {'_id': item.user_id}) %}
+          <li data-id="{{ item._id }}" {{ 'class=jieda-daan' if item.is_adopted }}>
+            <a name="item-{{ item._id }}"></a>
+            <div class="detail-about detail-about-reply">
+              <a class="fly-avatar" href="/user/{{ item_user._id}}">
+                <img src="{{ item_user.avatar }}" alt=" ">
+              </a>
+              <div class="fly-detail-user">
+                <a href="/user/{{ item_user._id}}" class="fly-link">
+                  <cite>{{ item_user.username }}</cite>
+                  {% if item_user.renzheng %}
+                    <i class="iconfont icon-renzheng">{{ item_user.renzheng }}</i>
+                  {% endif %}
+                  {% if item_user.get('vip', 0) > 0 %}
+                    <i class="layui-badge fly-badge-vip">VIP{{ item_user.vip }}</i>
+                  {% endif %}
+                </a>
+                
+                {% if post.user_id == item_user_id %}
+                  <span>(楼主)</span>
+                {% endif %}
+                {% if item_user.is_admin %}
+                  <span style="color:#5FB878">(管理员)</span>
+                {% endif %}
+                {% if item_user.is_disabled %}
+                  <span style="color:#999">（该号已被封）</span>
+                {% endif %}
+              </div>
+
+              <div class="detail-hits">
+                <span>{{ item.create_at|mongo_date_str }}</span>
+              </div>
+              {% if item.is_adopted %}
+                <i class="iconfont icon-caina" title="最佳答案"></i>
+              {% endif %}
+            </div>
+            <div class="detail-body jieda-body photos">
+              {{ item.content }}
+            </div>
+            <div class="jieda-reply">
+              {% if current_user.is_authenticated and (not current_user.user.is_disabled) %}
+                <span class="jieda-zan {{ 'zanok' if current_user.user['_id'] in item.get('zan', []) }}" type="zan">
+                  <i class="iconfont icon-zan"></i>
+                  <em>{{ item.get('zan_count', 0) }}</em>
+                </span>
+                <span type="reply">
+                  <i class="iconfont icon-svgmoban53"></i>
+                  回复
+                </span>
+              {% endif %}
+
+
+
+              <div class="jieda-admin">
+                {% if current_user.is_authenticated  and (item_user._id == current_user.user._id) and not post.is_closed %}
+                  <span type="edit">编辑</span>
+                {% endif %}
+                {% if current_user.is_authenticated  and (current_user.user.is_admin) %}
+                  <span type="del">删除</span>
+                {% endif %}
+                {% if not post.accepted and current_user.is_authenticated  and post.user._id == current_user.user._id %}
+                  <span class="jieda-accept" type="accept">采纳</span>
+                {% endif %}
+
+              </div>
+
+            </div>
+          </li>
+        {% else %}
+          <li class="fly-none">消灭零回复</li>
+        {% endfor %}
+
+      </ul>
+      {% if comment_page.total_page > 1 %}
+        {% set url_prefix=("/post/" + post._id|string) %}
+
+        {{ pagination.paginate(comment_page, url_prefix) }}
+      {% endif %}
+
+      {% if current_user.is_authenticated %}
+        {% if not post.is_closed %}
+          <div class="layui-form layui-form-pane">
+            <form action="/api/reply" method="post">
+              <div class="layui-form-item layui-form-text">
+                <a name="comment"></a>
+                <div class="layui-input-block">
+              <textarea id="L_content" name="content" required lay-verify="required" placeholder="请输入内容"
+                        class="layui-textarea fly-editor" style="height: 150px;"></textarea>
+                </div>
+              </div>
+              <div class="layui-form-item">
+                <input type="hidden" name="id" value="{{ post._id }}">
+                <button class="layui-btn" lay-filter="*" lay-submit>提交回复</button>
+              </div>
+            </form>
+          </div>
+        {% else %}
+          <div class="layui-form-pane">
+            <p style="text-align: center">此帖已结</p>
+          </div>
+
+        {% endif %}
+
+      {% else %}
+        <a class="layui-btn" href="/user/login?next=/post/{{ post._id }}" style="text-align: center">登录后回贴</a>
+      {% endif %}
+
+
+    </div>
+  </div>
+{% endblock %}
+{% block fly_use %}
+  .use(['fly', 'face'], function(){
+  var $ = layui.$
+  ,fly = layui.fly;
+  $('.detail-body').each(function(){
+  var othis = $(this), html = othis.html();
+  othis.html(fly.content(html));
+  });
+  });
+{% endblock %}
