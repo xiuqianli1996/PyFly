@@ -1,7 +1,7 @@
 from fly_bbs.utils import JSONEncoder
 from werkzeug.security import check_password_hash
 class Page:
-    def __init__(self, pn, size, sort_by, filter1, result, has_more, total_page, total):
+    def __init__(self, pn, size, sort_by=None, filter1=None, result=None, has_more=False, total_page=0, total=0):
         self.pn = pn
         self.size = size
         self.sort_by = sort_by

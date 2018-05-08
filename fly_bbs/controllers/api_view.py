@@ -2,7 +2,7 @@ from flask import Blueprint, render_template,flash, request,session,jsonify, url
 from flask_login import login_user, logout_user, login_required, current_user
 from flask_uploads import UploadNotAllowed
 from fly_bbs import db_utils,forms, models
-from fly_bbs.extensions import mongo, upload_photos
+from fly_bbs.extensions import mongo, upload_photos, whoosh_searcher
 from bson.objectid import ObjectId
 from bson.json_util import dumps
 from datetime import datetime
@@ -180,6 +180,9 @@ def post_delete(post_id):
         return jsonify(models.BaseResult(1, '权限不足'))
     mongo.db.posts.delete_one({'_id': post_id})
     mongo.db.users.update_many({}, {'$pull': {'collections': post_id}})
+
+    # 删除检索索引
+    whoosh_searcher.delete_document('posts', 'obj_id', str(post_id))
     return jsonify(models.BaseResult(0, '删除成功').put('action', url_for('index.index', catalog_id=post['catalog_id'])))
 
 @api_view.route('/post/set/<ObjectId:post_id>/<string:field>/<int:val>', methods=['POST'])

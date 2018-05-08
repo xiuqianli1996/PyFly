@@ -180,9 +180,9 @@ class PostsModelView(BaseModelView):
     column_labels = dict(title='标题', comment_count='回帖数', view_count='查看数', is_top='置顶', is_cream='加精', is_closed='已结', create_at='创建日期', modify_at='最后编辑日期', reward='悬赏')
     # column_sortable_list = 'name'
     # column_default_sort = ('name', False)
-    can_create = True
+    can_create = False
     can_delete = True
-    can_edit = True
+    can_edit = False
     form = PostsForm
     def after_model_delete(self, model):
         from fly_bbs.extensions import mongo

@@ -12,7 +12,9 @@ class Dev:
     MAIL_SUBJECT_PREFIX = '[PyFly]-'
 
     UPLOADED_PHOTOS_ALLOW = IMAGES
-    UPLOADED_PHOTOS_DEST = os.getcwd() + '/uploads'
+    UPLOADED_PHOTOS_DEST = os.path.join(os.getcwd(), 'uploads')
+
+    WHOOSH_PATH = os.path.join(os.getcwd(), 'whoosh_indexes')
 
 class Pud:
     pass
