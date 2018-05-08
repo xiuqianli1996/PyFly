@@ -1,0 +1,62 @@
+{% extends 'posts.html' %}
+{% import '_pagination.html' as pagination %}
+{% block content %}
+  <div class="layui-col-md8">
+    <div class="fly-panel" style="margin-bottom: 0;">
+      <form action="{{ url_for('index.post_search') }}" method="get" class="layui-form"
+            style="text-align: center; padding-top: 30px">
+        <div class="layui-form-item">
+          <div class="layui-inline">
+            <input type="text" name="kw" class="layui-input layui-input-inline" value="{{ kw }}" placeholder="请输入搜索关键字"
+                   >
+          </div>
+          <div class="layui-inline">
+            <button class="layui-btn">搜索</button>
+          </div>
+        </div>
+
+      </form>
+      {% if kw %}
+        <p style="margin: 8px;">"{{ kw }}"的搜索结果共有 <span style="color:red;">{{ page.total }}</span> 条</p>
+      {% endif %}
+
+      <ul class="fly-list">
+        {% for item in page.result %}
+          {% set item_user = mongo_find_one('users', {'_id': item.user_id}) or {} %}
+          {% set item_catalog = mongo_find_one('catalogs', {'_id': item.catalog_id}) %}
+          <li>
+            <a href="/user/{{ item_user._id }}" class="fly-avatar">
+              <img src="{{ item_user.avatar or '/static/images/avatar/1.jpg' }}" alt="{{ item_user.username }}">
+            </a>
+            <h2>
+              <a class="layui-badge">{{ item_catalog.name }}</a>
+              <a href="/post/{{ item.obj_id }}">{{ item.title }}</a>
+            </h2>
+            <div class="fly-list-info">
+              <a href="/user/{{ item_user._id or 'none' }}" link>
+                <cite>{{ item_user.username or '无名' }}</cite>
+                {% if item_user.renzheng %}
+                  <i class="iconfont icon-renzheng">{{ item_user.renzheng }}</i>
+                {% endif %}
+                {% if item_user.get('vip', 0) > 0 %}
+                  <i class="layui-badge fly-badge-vip">VIP{{ item_user.vip }}</i>
+                {% endif %}
+              </a>
+              <span>{{ item.create_at|mongo_date_str }}</span>
+
+            </div>
+          </li>
+        {% else %}
+          <div style="min-height: 60px; text-align: center; padding-top:50px; color: #999;">没有相关数据</div>
+        {% endfor %}
+      </ul>
+      {% if page.total_page > 1 %}
+        {% set url_prefix="/search/" %}
+        {% set url_suffix=('?kw=' + kw) if kw else '' %}
+        {{ pagination.paginate(page, url_prefix, url_suffix) }}
+      {% endif %}
+    </div>
+  </div>
+
+
+{% endblock %}
