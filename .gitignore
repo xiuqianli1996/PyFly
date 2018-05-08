@@ -105,5 +105,5 @@ venv.bak/
 
 ./uploads/
 uploads/
-./whoosh_indexes
+whoosh_indexes
 *.lock
