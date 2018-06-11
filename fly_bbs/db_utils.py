@@ -2,6 +2,7 @@ from fly_bbs.extensions import mongo
 from fly_bbs.models import Page
 from bson.objectid import ObjectId
 
+
 def _process_filter(filter1):
     if filter1 is None:
         return
@@ -9,8 +10,10 @@ def _process_filter(filter1):
     if _id and not isinstance(_id, ObjectId):
         filter1['_id'] = ObjectId(_id)
 
+
 def get_option(name, default=None):
     return mongo.db.options.find_one({'code': name}) or default
+
 
 def get_page(collection_name, pn=1, size=10, sort_by=None, filter1=None):
     _process_filter(filter1)
@@ -35,6 +38,7 @@ def get_page(collection_name, pn=1, size=10, sort_by=None, filter1=None):
     page = Page(pn, size, sort_by, filter1, list(result), has_more, total_page, total)
     return page
 
+
 def get_list(collection_name, sort_by=None, filter1=None, size=None):
     _process_filter(filter1)
     result = mongo.db[collection_name].find(filter1)
@@ -44,6 +48,7 @@ def get_list(collection_name, sort_by=None, filter1=None, size=None):
         result = result.limit(size)
     result = list(result)
     return result
+
 
 def find_one(collection_name, filter1=None):
     _process_filter(filter1)

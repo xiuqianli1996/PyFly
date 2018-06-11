@@ -29,6 +29,11 @@ def init():
             'val': '/static/images/logo.png'
         },
         {
+            'name': '签到奖励区间（格式: 1-100）',
+            'code': 'sign_interval',
+            'val': '1-100'
+        },
+        {
             'name': '开启用户注册（0关闭，1开启)',
             'code': 'open_user',
             'val': '1'

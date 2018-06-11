@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template,flash, request, url_for, current_app, session, jsonify, abort, redirect
-from fly_bbs import db_utils, utils, forms, models
+from fly_bbs import db_utils, utils, forms, models, code_msg
 from fly_bbs.extensions import mongo, whoosh_searcher
 from flask_login import login_required
 from flask_login import current_user
@@ -11,6 +11,7 @@ from whoosh import query,sorting, qparser
 
 bbs_index = Blueprint("index", __name__, url_prefix="", template_folder="templates")
 
+
 @bbs_index.route('/')
 @bbs_index.route('/page/<int:pn>/size/<int:size>')
 @bbs_index.route('/page/<int:pn>')
@@ -19,7 +20,7 @@ bbs_index = Blueprint("index", __name__, url_prefix="", template_folder="templat
 @bbs_index.route("/catalog/<ObjectId:catalog_id>/page/<int:pn>/size/<int:size>")
 def index(pn=1, size=10, catalog_id=None):
     # flash("asdsdsad")
-    #print(datetime.now())
+    # print(datetime.now())
     sort_key = request.values.get('sort_key', '_id')
     sort_by = (sort_key, pymongo.DESCENDING)
     post_type = request.values.get('type')
@@ -33,9 +34,10 @@ def index(pn=1, size=10, catalog_id=None):
     if catalog_id:
         filter1['catalog_id'] = catalog_id
     page = db_utils.get_page('posts', pn=pn, filter1=filter1, size=size, sort_by=sort_by)
-    #print(page)
+    # print(page)
     return render_template("post_list.html", is_index=catalog_id is None, page=page, sort_key=sort_key
                            , catalog_id=catalog_id, post_type=post_type)
+
 
 @bbs_index.route('/add', methods=['GET', 'POST'])
 @bbs_index.route('/edit/<ObjectId:post_id>', methods=['GET', 'POST'])
@@ -45,16 +47,15 @@ def add(post_id=None):
     if posts_form.is_submitted():
         if not posts_form.validate():
             return jsonify(models.BaseResult(1, str(posts_form.errors)))
-        if not utils.verify_num(posts_form.vercode.data):
-            return jsonify(models.BaseResult(1, str('验证码错误')))
+        utils.verify_num(posts_form.vercode.data)
 
         user = current_user.user
         if not user.get('is_active', False) or user.get('is_disabled', False):
-            return jsonify(models.BaseResult(1, '账号未激活或已被禁用'))
+            return jsonify(code_msg.USER_UN_ACTIVE_OR_DISABLED)
 
         user_coin = user.get('coin', 0)
         if posts_form.reward.data > user_coin:
-            return jsonify(models.BaseResult(1, '悬赏金币不能大于拥有的金币，当前账号金币为：' + str(user_coin)))
+            return jsonify(models.R.ok('悬赏金币不能大于拥有的金币，当前账号金币为：' + str(user_coin)))
         posts = {
             'title': posts_form.title.data,
             'catalog_id': ObjectId(posts_form.catalog_id.data),
@@ -85,7 +86,7 @@ def add(post_id=None):
         # 更新索引文档
         update_index(mongo.db.posts.find_one_or_404({'_id': post_id}))
 
-        return jsonify(models.R().ok().put('msg', msg).put('action',url_for('index.index')))
+        return jsonify(models.R.ok(msg).put('action', url_for('index.index')))
     else:
         ver_code = utils.gen_verify_num()
         # session['ver_code'] = ver_code['answer']
@@ -94,6 +95,7 @@ def add(post_id=None):
             posts = mongo.db.posts.find_one_or_404({'_id': post_id})
         title = '发帖' if post_id is None else '编辑帖子'
         return render_template('jie/add.html', page_name='jie', ver_code=ver_code['question'], form=posts_form, is_add=(post_id is None), post=posts, title=title)
+
 
 def update_index(post):
     _id = str(post['_id'])
@@ -107,6 +109,7 @@ def update_index(post):
 
     whoosh_searcher.update_document('posts', {'obj_id': _id}, post_index)
 
+
 @bbs_index.route('/post/<ObjectId:post_id>/')
 @bbs_index.route('/post/<ObjectId:post_id>/page/<int:pn>/')
 def post_detail(post_id, pn=1):
@@ -119,6 +122,7 @@ def post_detail(post_id, pn=1):
     page = db_utils.get_page('comments', pn=pn, size=10, filter1={'post_id': post_id}, sort_by=('is_adopted', -1))
     return render_template('jie/detail.html', post=post, title=post['title'], page_name='jie', comment_page=page, catalog_id=post['catalog_id'])
 
+
 @bbs_index.route('/jump')
 def jump_user():
     username = request.values.get('username')
@@ -126,6 +130,7 @@ def jump_user():
         abort(404)
     user = mongo.db.users.find_one_or_404({'username': username})
     return redirect('/user/' + str(user['_id']))
+
 
 @bbs_index.route('/comment/<ObjectId:comment_id>/')
 def jump_comment(comment_id):
@@ -136,9 +141,10 @@ def jump_comment(comment_id):
         comment_index = mongo.db.comments.count({'post_id': post_id, '_id': {'$lt': comment_id}})
         pn = comment_index / 10
         if pn == 0 or pn % 10 != 0:
-            pn +=  1
+            pn += 1
     return redirect(url_for('index.post_detail', post_id=post_id, pn=pn) + '#item-' + str(comment_id))
     # return redirect('/post/' + str(post_id)  + '/' + str(pn) + '/')
+
 
 @bbs_index.route('/search')
 @bbs_index.route('/search/page/<int:pn>/')
@@ -157,6 +163,7 @@ def post_search(pn=1, size=10):
         print(page.result)
     # return jsonify(page)
     return render_template('search/list.html', title=keyword + '搜索结果', page=page, kw=keyword)
+
 
 @bbs_index.route('/refresh/indexes')
 def refresh_indexes():

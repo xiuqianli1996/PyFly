@@ -318,10 +318,10 @@ layui.define(['layer', 'laytpl', 'form', 'element', 'upload', 'util'], function(
   //签到
   var tplSignin = ['{{# if(d.signed){ }}'
     ,'<button class="layui-btn layui-btn-disabled">今日已签到</button>'
-    ,'<span>获得了<cite>{{ d.experience }}</cite>飞吻</span>'
+    ,'<span>获得了<cite>{{ d.coin }}</cite>金币</span>'
   ,'{{# } else { }}'
     ,'<button class="layui-btn layui-btn-danger" id="LAY_signin">今日签到</button>'
-    ,'<span>可获得<cite>{{ d.experience }}</cite>飞吻</span>'
+    // ,'<span>可获得<cite>{{ d.experience }}</cite>金币</span>'
   ,'{{# } }}'].join('')
   ,tplSigninDay = '已连续签到<cite>{{ d.days }}</cite>天'
 
@@ -329,9 +329,9 @@ layui.define(['layer', 'laytpl', 'form', 'element', 'upload', 'util'], function(
     laytpl(tplSignin).render(data, function(html){
       elemSigninMain.html(html);
     });
-    laytpl(tplSigninDay).render(data, function(html){
-      elemSigninDays.html(html);
-    });
+    // laytpl(tplSigninDay).render(data, function(html){
+    //   elemSigninDays.html(html);
+    // });
   }
 
   ,elemSigninHelp = $('#LAY_signinHelp')
@@ -340,21 +340,17 @@ layui.define(['layer', 'laytpl', 'form', 'element', 'upload', 'util'], function(
   ,elemSigninDays = $('.fly-signin-days');
   
   if(elemSigninMain[0]){
-    /*
-    fly.json('/sign/status', function(res){
+    fly.json('/api/sign/status', function(res){
       if(!res.data) return;
-      signRender.token = res.data.token;
+      // signRender.token = res.data.token;
       signRender(res.data);
     });
-    */
   }
   $('body').on('click', '#LAY_signin', function(){
     var othis = $(this);
     if(othis.hasClass(DISABLED)) return;
 
-    fly.json('/sign/in', {
-      token: signRender.token || 1
-    }, function(res){
+    fly.json('/api/sign', function(res){
       signRender(res.data);
     }, {
       error: function(){
@@ -372,25 +368,26 @@ layui.define(['layer', 'laytpl', 'form', 'element', 'upload', 'util'], function(
       ,title: '签到说明'
       ,area: '300px'
       ,shade: 0.8
-      ,shadeClose: true
-      ,content: ['<div class="layui-text" style="padding: 20px;">'
-        ,'<blockquote class="layui-elem-quote">“签到”可获得社区飞吻，规则如下</blockquote>'
-        ,'<table class="layui-table">'
-          ,'<thead>'
-            ,'<tr><th>连续签到天数</th><th>每天可获飞吻</th></tr>'
-          ,'</thead>'
-          ,'<tbody>'
-            ,'<tr><td>＜5</td><td>5</td></tr>'
-            ,'<tr><td>≥5</td><td>10</td></tr>'
-            ,'<tr><td>≥15</td><td>15</td></tr>'
-            ,'<tr><td>≥30</td><td>20</td></tr>'
-          ,'</tbody>'
-        ,'</table>'
-        ,'<ul>'
-          ,'<li>中间若有间隔，则连续天数重新计算</li>'
-          ,'<li style="color: #FF5722;">不可利用程序自动签到，否则飞吻清零</li>'
-        ,'</ul>'
-      ,'</div>'].join('')
+      ,shadeClose: true,
+        content: '<blockquote class="layui-elem-quote">“签到”可获得社区社区金币，数量随机</blockquote>'
+      // ,content: ['<div class="layui-text" style="padding: 20px;">'
+      //   ,'<blockquote class="layui-elem-quote">“签到”可获得社区飞吻，规则如下</blockquote>'
+      //   ,'<table class="layui-table">'
+      //     ,'<thead>'
+      //       ,'<tr><th>连续签到天数</th><th>每天可获飞吻</th></tr>'
+      //     ,'</thead>'
+      //     ,'<tbody>'
+      //       ,'<tr><td>＜5</td><td>5</td></tr>'
+      //       ,'<tr><td>≥5</td><td>10</td></tr>'
+      //       ,'<tr><td>≥15</td><td>15</td></tr>'
+      //       ,'<tr><td>≥30</td><td>20</td></tr>'
+      //     ,'</tbody>'
+      //   ,'</table>'
+      //   ,'<ul>'
+      //     ,'<li>中间若有间隔，则连续天数重新计算</li>'
+      //     ,'<li style="color: #FF5722;">不可利用程序自动签到，否则飞吻清零</li>'
+      //   ,'</ul>'
+      // ,'</div>'].join('')
     });
   });
 
