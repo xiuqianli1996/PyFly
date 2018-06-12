@@ -122,11 +122,13 @@ class PagesModelView(BaseModelView):
 
 class CatalogsForm(form.Form):
     name = fields.StringField('栏目名称')
-    form_columns = 'name'
+    sort_key = fields.IntegerField('排序', default=0)
+    form_columns = ('name', 'sort_key')
+
 
 class CatalogsModelView(BaseModelView):
-    column_list = ('name',)
-    column_labels = dict(name='栏目名称')
+    column_list = ('name', 'sort_key')
+    column_labels = dict(name='栏目名称', sort_key='排序')
     # column_sortable_list = 'name'
     # column_default_sort = ('name', False)
     can_create = True
