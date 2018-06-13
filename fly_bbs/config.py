@@ -15,6 +15,14 @@ class Dev:
     UPLOADED_PHOTOS_DEST = os.path.join(os.getcwd(), 'uploads')
     WHOOSH_PATH = os.path.join(os.getcwd(), 'whoosh_indexes')
 
+    USE_CACHE = True
+    CACHE_TYPE = 'redis'
+    CACHE_REDIS_HOST = '172.16.1.202'
+    CACHE_REDIS_PORT = 6379
+    CACHE_REDIS_PASSWORD = '456123'
+    CACHE_REDIS_DB = '0'
+
+
 class Pud:
     pass
 

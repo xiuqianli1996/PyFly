@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template,flash, request, url_for, current_app, session, jsonify, abort, redirect
 from fly_bbs import db_utils, utils, forms, models, code_msg
-from fly_bbs.extensions import mongo, whoosh_searcher
+from fly_bbs.extensions import mongo, whoosh_searcher, cache, clear_cache
 from flask_login import login_required
 from flask_login import current_user
 from bson.objectid import ObjectId
@@ -18,9 +18,11 @@ bbs_index = Blueprint("index", __name__, url_prefix="", template_folder="templat
 @bbs_index.route("/catalog/<ObjectId:catalog_id>")
 @bbs_index.route("/catalog/<ObjectId:catalog_id>/page/<int:pn>")
 @bbs_index.route("/catalog/<ObjectId:catalog_id>/page/<int:pn>/size/<int:size>")
+@cache.cached(timeout=2 * 60, key_prefix=utils.gen_cache_key)
 def index(pn=1, size=10, catalog_id=None):
     # flash("asdsdsad")
-    # print(datetime.now())
+
+    print(datetime.now())
     sort_key = request.values.get('sort_key', '_id')
     sort_by = (sort_key, pymongo.DESCENDING)
     post_type = request.values.get('type')
@@ -42,6 +44,7 @@ def index(pn=1, size=10, catalog_id=None):
 @bbs_index.route('/add', methods=['GET', 'POST'])
 @bbs_index.route('/edit/<ObjectId:post_id>', methods=['GET', 'POST'])
 @login_required
+@clear_cache
 def add(post_id=None):
     posts_form = forms.PostsForm()
     if posts_form.is_submitted():

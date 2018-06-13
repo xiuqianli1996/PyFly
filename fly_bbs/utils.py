@@ -4,7 +4,7 @@ from bson import ObjectId
 from flask_mail import Message
 from . import extensions, models
 from threading import Thread
-from flask import current_app, session
+from flask import current_app, session, request
 
 
 class JSONEncoder(json.JSONEncoder):
@@ -28,6 +28,10 @@ def gen_verify_num():
     data = {'question': str(a) + ' + ' + str(b) + " = ?", 'answer': str(a + b)}
     session['ver_code'] = data['answer']
     return data
+
+
+def gen_cache_key():
+    return 'view//' + request.full_path
 
 
 def send_mail_async(app, msg):

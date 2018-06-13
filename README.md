@@ -1,6 +1,9 @@
 # PyFly
 
 #### 更新记录
+
+2018.06.13 学校专业实训的第三天，实在太闲，进行了一下压测，吞吐量惨不忍睹，加上redis缓存，稍微好了一些
+
 2018.06.11 实现简单的签到功能，奖励为1-100的随机值
 
 2018.05.08 开发者审核迟迟未通过，没法玩微博账号登录，突然想起搜索还没做，看了一会whoosh文档就开了撸了一波代码，用了jieba分词，效果还行
@@ -26,7 +29,7 @@ git clone https://gitee.com/981764793/PyFly
 
 pip install -r requirements.txt
 
-python manager.py
+python manager.py runserver
 ```
 
 #### 使用说明
@@ -39,7 +42,7 @@ python manager.py
 
 4.图片上传可选保存到后端或图床，默认保存到服务器，如果要开启图床上传在/static/js/mods/index.js搜索开启图床注释和解开相应注释后即可，然后在user.js进行相应操作，图床使用了[SM.MS图床](http://sm.ms)
 
-####模板开发
+#### 模板开发
 
 1.全局过滤器mongo_date_str（格式化mongodb的日期字段）
 
@@ -51,7 +54,7 @@ python manager.py
     4）date_cal(d1, num, is_add=True) 计算日期
 
 
-####Todo
+#### Todo
 
 1.社交账号登录
 

@@ -2,7 +2,7 @@ from flask import Blueprint, render_template,flash, request,session,jsonify, url
 from flask_login import login_user, logout_user, login_required, current_user
 from flask_uploads import UploadNotAllowed
 from fly_bbs import db_utils, forms, models, code_msg
-from fly_bbs.extensions import mongo, upload_photos, whoosh_searcher
+from fly_bbs.extensions import mongo, upload_photos, whoosh_searcher, clear_cache
 from bson.objectid import ObjectId
 from bson.json_util import dumps
 from datetime import datetime
@@ -176,6 +176,7 @@ def reply_update(comment_id):
 
 @api_view.route('/post/delete/<ObjectId:post_id>', methods=['POST'])
 @login_required
+@clear_cache
 def post_delete(post_id):
     post = mongo.db.posts.find_one_or_404({'_id': ObjectId(post_id)})
     if post['user_id'] != current_user.user['_id'] and not current_user.user['is_admin']:
@@ -185,11 +186,13 @@ def post_delete(post_id):
 
     # 删除检索索引
     whoosh_searcher.delete_document('posts', 'obj_id', str(post_id))
+
     return jsonify(code_msg.DELETE_SUCCESS.put('action', url_for('index.index', catalog_id=post['catalog_id'])))
 
 
 @api_view.route('/post/set/<ObjectId:post_id>/<string:field>/<int:val>', methods=['POST'])
 @login_required
+@clear_cache
 def post_set(post_id, field, val):
     post = mongo.db.posts.find_one_or_404({'_id': post_id})
     if field != 'is_closed':
